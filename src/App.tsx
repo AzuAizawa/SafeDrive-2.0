@@ -16,7 +16,7 @@ function App() {
         } else {
           setDbStatus('Connected!')
         }
-      } catch (err) {
+      } catch {
         setDbStatus('Error connecting to Supabase')
       }
     }
