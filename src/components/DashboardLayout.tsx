@@ -45,7 +45,7 @@ export default function DashboardLayout() {
     navigate('/login')
   }
 
-  const handleToggleMode = useCallback(async () => \{
+  const handleToggleMode = useCallback(async () => {
     if (!user || !profile) return
     const { error } = await supabase
       .from('profiles')
@@ -55,7 +55,7 @@ export default function DashboardLayout() {
       await refreshProfile()
       toast.success(isLister ? 'Switched to Renter mode' : 'Switched to Lister mode')
     }
-  }
+  }, [user, profile, isLister, refreshProfile])
 
   const navItems = [
     { to: '/browse', label: 'Browse Cars', icon: CarFront },
