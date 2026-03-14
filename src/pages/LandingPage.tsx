@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Car, Shield, CreditCard, Users, ChevronRight, Star, Zap, CheckCircle } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
@@ -218,16 +218,57 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 py-8">
+      <footer className="border-t border-border/40 py-16 bg-muted/20">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <Car className="w-4 h-4 text-primary" />
-              <span className="text-sm font-semibold">SafeDrive 2.0</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-16">
+            <div className="col-span-2">
+              <div className="flex items-center gap-2.5 mb-6">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Car className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold tracking-tight">SafeDrive</span>
+              </div>
+              <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
+                The leading peer-to-peer car rental marketplace. Connect with car owners in your area and get on the road in minutes.
+              </p>
             </div>
+            
+            <div>
+              <h4 className="font-bold text-sm uppercase tracking-widest mb-6">Renting</h4>
+              <ul className="space-y-4 text-sm text-muted-foreground">
+                <li><Link to="/browse" className="hover:text-primary transition-colors">Browse Cars</Link></li>
+                <li><Link to="/signup" className="hover:text-primary transition-colors">How to Book</Link></li>
+                <li><Link to="/signup" className="hover:text-primary transition-colors">Safety for Renters</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-sm uppercase tracking-widest mb-6">Listing</h4>
+              <ul className="space-y-4 text-sm text-muted-foreground">
+                <li><Link to="/signup" className="hover:text-primary transition-colors">List Your Car</Link></li>
+                <li><Link to="/signup" className="hover:text-primary transition-colors">Insurance</Link></li>
+                <li><Link to="/signup" className="hover:text-primary transition-colors">Lister Tips</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-bold text-sm uppercase tracking-widest mb-6">Company</h4>
+              <ul className="space-y-4 text-sm text-muted-foreground">
+                <li><Link to="/" className="hover:text-primary transition-colors">About Us</Link></li>
+                <li><Link to="/" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+                <li><Link to="/" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-xs text-muted-foreground">
-              © 2026 SafeDrive. All rights reserved.
+              © 2026 SafeDrive 2.0. All rights reserved.
             </p>
+            <div className="flex items-center gap-6">
+              <Link to="/" className="text-muted-foreground hover:text-primary transition-colors"><Shield className="w-4 h-4" /></Link>
+              <Link to="/" className="text-muted-foreground hover:text-primary transition-colors"><Users className="w-4 h-4" /></Link>
+            </div>
           </div>
         </div>
       </footer>

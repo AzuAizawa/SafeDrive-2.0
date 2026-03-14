@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
+import { uploadFile } from '@/lib/uploadUtils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Car, Plus, Loader2, CheckCircle, Clock, XCircle, ImageIcon, Upload } from 'lucide-react'
+import { Car, Plus, Loader2, ImageIcon, Upload } from 'lucide-react'
 import { toast } from 'sonner'
 import type { CarBrand, CarModel } from '@/types/database'
 
@@ -39,16 +40,18 @@ export default function MyVehiclesPage() {
   const [submitting, setSubmitting] = useState(false)
 
   const [form, setForm] = useState({
-    brand_id: '',
-    model_id: '',
+    brand_id: null as string | null,
+    model_id: null as string | null,
     plate_number: '',
     mileage: '',
     price_per_day: '',
     location: '',
     additional_info: '',
+    rental_agreement: '',
   })
   const [carImages, setCarImages] = useState<File[]>([])
   const [orcrFile, setOrcrFile] = useState<File | null>(null)
+  const [rentalAgreementFile, setRentalAgreementFile] = useState<File | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -111,25 +114,40 @@ export default function MyVehiclesPage() {
       // Upload car images
       for (let i = 0; i < carImages.length; i++) {
         const file = carImages[i]
-        const ext = file.name.split('.').pop()
-        const path = `${user.id}/${carData.id}/image_${i}.${ext}`
-        await supabase.storage.from('vehicle-documents').upload(path, file, { upsert: true })
+        const path = `${user.id}/${carData.id}/image_${i}`
+        const result = await uploadFile(file, 'vehicle-documents', path)
+        if (!result.success) throw new Error(result.error || 'Upload failed')
+
         await supabase.from('car_images').insert({
           car_id: carData.id,
-          storage_path: path,
+          storage_path: result.url!,
           is_primary: i === 0,
         })
       }
 
       // Upload ORCR
       if (orcrFile) {
-        const ext = orcrFile.name.split('.').pop()
-        const path = `${user.id}/${carData.id}/orcr.${ext}`
-        await supabase.storage.from('vehicle-documents').upload(path, orcrFile, { upsert: true })
+        const path = `${user.id}/${carData.id}/orcr`
+        const result = await uploadFile(orcrFile, 'vehicle-documents', path)
+        if (!result.success) throw new Error(result.error || 'Upload failed')
+
         await supabase.from('car_documents').insert({
           car_id: carData.id,
           document_type: 'orcr',
-          storage_path: path,
+          storage_path: result.url!,
+        })
+      }
+
+      // Upload rental agreement
+      if (rentalAgreementFile) {
+        const path = `${user.id}/${carData.id}/rental_agreement`
+        const result = await uploadFile(rentalAgreementFile, 'vehicle-documents', path)
+        if (!result.success) throw new Error(result.error || 'Upload failed')
+
+        await supabase.from('car_documents').insert({
+          car_id: carData.id,
+          document_type: 'rental_agreement',
+          storage_path: result.url!,
         })
       }
 
@@ -143,9 +161,10 @@ export default function MyVehiclesPage() {
 
       toast.success('Vehicle submitted for approval!')
       setShowForm(false)
-      setForm({ brand_id: '', model_id: '', plate_number: '', mileage: '', price_per_day: '', location: '', additional_info: '' })
+      setForm({ brand_id: null, model_id: null, plate_number: '', mileage: '', price_per_day: '', location: '', additional_info: '', rental_agreement: '' })
       setCarImages([])
       setOrcrFile(null)
+      setRentalAgreementFile(null)
       fetchVehicles()
     } catch (err: unknown) {
       toast.error('Failed to submit', { description: (err as Error).message })
@@ -185,7 +204,9 @@ export default function MyVehiclesPage() {
                     value={form.brand_id}
                     onValueChange={(val) => {
                       setForm({ ...form, brand_id: val, model_id: '' })
-                      fetchModels(val)
+                      if (val) {
+                        fetchModels(val)
+                      }
                     }}
                   >
                     <SelectTrigger className="h-10">
@@ -258,6 +279,17 @@ export default function MyVehiclesPage() {
                     {orcrFile ? orcrFile.name : 'Upload ORCR image'}
                   </span>
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => setOrcrFile(e.target.files?.[0] || null)} />
+                </label>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Rental Agreement (PDF)</Label>
+                <label className="flex flex-col items-center justify-center h-24 rounded-lg border-2 border-dashed border-border hover:border-primary/50 cursor-pointer transition-colors">
+                  <Upload className="w-5 h-5 text-muted-foreground mb-1" />
+                  <span className="text-xs text-muted-foreground">
+                    {rentalAgreementFile ? rentalAgreementFile.name : 'Upload rental agreement'}
+                  </span>
+                  <input type="file" accept="application/pdf" className="hidden" onChange={(e) => setRentalAgreementFile(e.target.files?.[0] || null)} />
                 </label>
               </div>
 

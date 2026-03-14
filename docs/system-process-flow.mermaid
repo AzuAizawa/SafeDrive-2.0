@@ -1,0 +1,62 @@
+graph TD
+    %% User Flow
+    Start((Start)) --> Landing[Landing Page]
+    Landing --> |Click Sign Up| SignUp[Sign Up Page]
+    Landing --> |Click Log In| Login[Login Page]
+    
+    SignUp --> |Email Confirmation| VerifiedAccount[Account Activated]
+    VerifiedAccount --> Login
+    
+    Login --> |Default| RenterMode[Renter Mode / Dashboard]
+    
+    subgraph "User Experience"
+        RenterMode --> |Click Profile| ProfileMenu[Profile Dropdown]
+        ProfileMenu --> |Select Verify| VerifyPage[Verification Page]
+        VerifyPage --> |Upload 4 Images| PendingVerification[Verification Pending]
+        
+        RenterMode --> |Browse| Browse[Browse Cars]
+        Browse --> |Select Car| CarDetail[Car Detail]
+        CarDetail --> |Book| PaymentDown[Pay 50% Downpayment]
+        PaymentDown --> |Checkout| ActiveBooking[Active Booking]
+        ActiveBooking --> |End Trip| PaymentBalance[Pay Balance]
+        PaymentBalance --> |Complete| BookingCompleted[Booking Completed]
+        
+        ProfileMenu --> |Toggle Lister| ListerMode[Lister Mode]
+        ListerMode --> |Add Car| AddVehicle[Add Vehicle Form]
+        AddVehicle --> |Upload ORCR| VehiclePending[Vehicle Pending Approval]
+        ListerMode --> |Manage| BookingsReceived[Bookings Received]
+    end
+    
+    %% Admin Flow
+    AdminStart((Admin Login)) --> AdminDash[Admin Dashboard]
+    
+    subgraph "Admin Operations"
+        AdminDash --> UsersTab[Users Management]
+        UsersTab --> |Review Images| ApproveUser[Approve User]
+        
+        AdminDash --> CatalogTab[Car Catalog]
+        CatalogTab --> |Manage| BrandModels[Brands & Models]
+        
+        AdminDash --> ApprovalTab[Vehicle Approval]
+        ApprovalTab --> |Cross-check ORCR| ApproveCar[Approve Vehicle]
+        
+        AdminDash --> PayoutTab[Send Payments]
+        PayoutTab --> |Manual Transfer| MarkSent[Mark Payout Sent]
+        
+        AdminDash --> AuditTab[Audit Trail]
+        AuditTab --> |Track| AllSystemEvents[System Logs]
+    end
+    
+    %% State Interactions
+    PendingVerification -.-> |Review| UsersTab
+    VehiclePending -.-> |Review| ApprovalTab
+    BookingCompleted -.-> |Payout Ready| PayoutTab
+    
+    %% Theme & Layout
+    classDef renter fill:#3b82f6,stroke:#1e3a8a,color:#fff
+    classDef lister fill:#8b5cf6,stroke:#4c1d95,color:#fff
+    classDef admin fill:#ef4444,stroke:#7f1d1d,color:#fff
+    
+    class RenterMode,Browse,CarDetail renter
+    class ListerMode,AddVehicle,BookingsReceived lister
+    class AdminDash,UsersTab,CatalogTab,ApprovalTab,PayoutTab,AuditTab admin

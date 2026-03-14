@@ -12,8 +12,8 @@ import { toast } from 'sonner'
 const imageFields = [
   { key: 'license_front', label: "Driver's License (Front)" },
   { key: 'license_back', label: "Driver's License (Back)" },
-  { key: 'national_id_front', label: 'National ID (Front)' },
-  { key: 'national_id_back', label: 'National ID (Back)' },
+  { key: 'national_id_front', label: "National ID (Front)" },
+  { key: 'national_id_back', label: "National ID (Back)" },
   { key: 'selfie_with_id', label: 'Selfie Holding ID' },
   { key: 'selfie', label: 'Selfie (Face Only)' },
 ] as const
@@ -238,11 +238,10 @@ export default function VerificationPage() {
               {imageFields.map((field) => (
                 <div key={field.key} className="space-y-2">
                   <Label>{field.label} *</Label>
-                  <label className={`flex flex-col items-center justify-center h-32 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${
-                    images[field.key]
-                      ? 'border-green-300 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20'
-                      : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                  }`}>
+                  <label className={`flex flex-col items-center justify-center h-32 rounded-lg border-2 border-dashed cursor-pointer transition-colors ${images[field.key]
+                    ? 'border-green-300 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20'
+                    : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                    }`}>
                     {images[field.key] ? (
                       <div className="text-center">
                         <CheckCircle className="w-6 h-6 text-green-500 mx-auto mb-1" />
