@@ -44,9 +44,11 @@ SafeDrive 2.0 is a **peer-to-peer car rental platform** similar to Airbnb but fo
    - **Birthday:** Date of birth
    - **Driver's License Number:** Text input
    - **National ID Number:** Text input
-   - **4 Required Images:**
+   - **6 Required Images:**
      - Driver's license FRONT
      - Driver's license BACK
+      - National ID FRONT
+      - National ID BACK
      - Selfie holding the ID
      - Selfie (face only)
    - File restrictions: JPG/PNG only, max 5MB each
@@ -63,7 +65,7 @@ SafeDrive 2.0 is a **peer-to-peer car rental platform** similar to Airbnb but fo
 3. Admin clicks a pending user → **modal opens** showing:
    - Full name, email, phone, address, birthday
    - Driver's license number, National ID number
-   - All 4 uploaded images (viewable/downloadable)
+   - All 6 uploaded images (viewable/downloadable)
 4. Admin inspects all information and images
 5. Admin can:
    - **Approve** → `verified_status = 'verified'`, audit log entry created
@@ -217,7 +219,7 @@ Shows all booking requests for the lister's cars:
 - Click row → **Modal** opens with:
   - All personal info (name, phone, address, birthday)
   - Driver's license & national ID numbers
-  - All 4 verification images (viewable)
+  - All 6 verification images (viewable)
   - **Approve** button → sets `verified_status = 'verified'`
   - **Reject** button → opens text input for reason → sets `verified_status = 'rejected'`
 

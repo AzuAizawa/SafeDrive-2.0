@@ -23,12 +23,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    setProfile(data)
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      
+      if (error) throw error
+      setProfile(data)
+    } catch (error) {
+      console.error('Error fetching profile:', error)
+      setProfile(null)
+    }
   }, [])
 
   const refreshProfile = useCallback(async () => {
@@ -38,35 +45,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, fetchProfile])
 
   useEffect(() => {
-    supabase.auth.getSession()
-      .then(({ data: { session: s } }) => {
-        setSession(s)
-        setUser(s?.user ?? null)
-        if (s?.user) {
-          fetchProfile(s.user.id)
-        }
-      })
-      .catch((error) => {
-        console.error('Initial session fetch error:', error)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+    let mounted = true
+    let subscription: { unsubscribe: () => void } | null = null
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, s) => {
+    async function init() {
+      try {
+        // 1. Get initial session
+        const { data: { session: s } } = await supabase.auth.getSession()
+        if (!mounted) return
+        
         setSession(s)
         setUser(s?.user ?? null)
+        
+        // 2. Set up listener
+        const { data } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+          if (!mounted) return
+          setSession(newSession)
+          setUser(newSession?.user ?? null)
+          if (newSession?.user) {
+            await fetchProfile(newSession.user.id)
+          } else {
+            setProfile(null)
+          }
+        })
+        subscription = data.subscription
+
+        // 3. Resolve profile in background if user exists
         if (s?.user) {
           await fetchProfile(s.user.id)
-        } else {
-          setProfile(null)
         }
-        setLoading(false)
+      } catch (err) {
+        console.error('Auth init error:', err)
+      } finally {
+        if (mounted) setLoading(false)
       }
-    )
+    }
 
-    return () => subscription.unsubscribe()
+    init()
+
+    return () => {
+      mounted = false
+      if (subscription) subscription.unsubscribe()
+    }
   }, [fetchProfile])
 
   const signUp = async (email: string, password: string) => {
@@ -80,10 +100,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
-    setProfile(null)
-    setSession(null)
+    try {
+      setLoading(true)
+      await supabase.auth.signOut()
+    } catch (error) {
+      console.error('Error signing out:', error)
+    } finally {
+      setUser(null)
+      setProfile(null)
+      setSession(null)
+      setLoading(false)
+    }
   }
 
   return (

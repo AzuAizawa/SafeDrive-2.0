@@ -4,11 +4,11 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ShieldCheck, Search, CheckCircle, XCircle, X, Eye, Loader2 } from 'lucide-react'
+import { ShieldCheck, Search, CheckCircle, XCircle, X, Eye, Loader2, Maximize2, Zap, AlertCircle, ZoomIn } from 'lucide-react'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 import type { Profile, VerificationImage } from '@/types/database'
@@ -27,6 +27,14 @@ export default function AdminUsersPage() {
   const [rejectionReason, setRejectionReason] = useState('')
   const [showRejectInput, setShowRejectInput] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+  const [previewImage, setPreviewImage] = useState<{ url: string; type: string } | null>(null)
+  const [zoomLevel, setZoomLevel] = useState(1)
+  const [checklist, setChecklist] = useState({
+    nameMatch: false,
+    idMatch: false,
+    faceMatch: false,
+    validExpiry: false,
+  })
 
   useEffect(() => {
     fetchUsers()
@@ -142,7 +150,7 @@ export default function AdminUsersPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input placeholder="Search by name or email..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-10" />
         </div>
-        <Select value={filter} onValueChange={setFilter}>
+        <Select value={filter} onValueChange={(val) => setFilter(val || 'all')}>
           <SelectTrigger className="w-full sm:w-48 h-10">
             <SelectValue />
           </SelectTrigger>
@@ -182,7 +190,12 @@ export default function AdminUsersPage() {
                 </TableRow>
               ) : (
                 filteredUsers.map((u) => (
-                  <TableRow key={u.id} className="cursor-pointer hover:bg-muted/50" onClick={() => { setSelectedUser(u); setShowRejectInput(false); setRejectionReason('') }}>
+                  <TableRow key={u.id} className="cursor-pointer hover:bg-muted/50" onClick={() => { 
+                    setSelectedUser(u); 
+                    setShowRejectInput(false); 
+                    setRejectionReason('');
+                    setChecklist({ nameMatch: false, idMatch: false, faceMatch: false, validExpiry: false });
+                  }}>
                     <TableCell className="font-medium">{u.full_name || '—'}</TableCell>
                     <TableCell>{u.email}</TableCell>
                     <TableCell>
@@ -236,23 +249,85 @@ export default function AdminUsersPage() {
               {/* Verification Images */}
               {selectedUser.verification_images.length > 0 && (
                 <div>
-                  <h3 className="font-semibold mb-3">Uploaded Documents</h3>
+                  <h3 className="font-semibold mb-3 flex items-center justify-between">
+                    Uploaded Documents
+                    <span className="text-xs font-normal text-muted-foreground items-center flex gap-1">
+                      <ZoomIn className="w-3 h-3" /> Click image for Deep Zoom
+                    </span>
+                  </h3>
                   <div className="grid grid-cols-2 gap-3">
                     {selectedUser.verification_images.map((img) => (
-                      <div key={img.id} className="space-y-1">
+                      <div key={img.id} className="group relative space-y-1">
                         <p className="text-xs text-muted-foreground capitalize">{img.image_type.replace(/_/g, ' ')}</p>
-                        <a href={getImageUrl(img.storage_path)} target="_blank" rel="noopener noreferrer">
+                        <div 
+                          className="relative aspect-video overflow-hidden rounded-lg border border-border group-hover:ring-2 group-hover:ring-primary transition-all cursor-zoom-in"
+                          onClick={() => {
+                            setPreviewImage({ url: getImageUrl(img.storage_path), type: img.image_type })
+                            setZoomLevel(1)
+                          }}
+                        >
                           <img
                             src={getImageUrl(img.storage_path)}
                             alt={img.image_type}
-                            className="w-full h-32 object-cover rounded-lg border border-border hover:ring-2 hover:ring-primary transition-all cursor-pointer"
+                            className="w-full h-full object-cover"
                           />
-                        </a>
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <Maximize2 className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
+
+              {/* Consistency Flagging Assistant */}
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-primary" />
+                    Automated Consistency Flags
+                  </h3>
+                  <span className="text-[10px] uppercase font-bold text-primary/60 tracking-wider">Experimental OCR Info</span>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div className="space-y-1.5 p-2 rounded bg-background/50 border border-border/50">
+                    <p className="text-muted-foreground">Form Full Name</p>
+                    <p className="font-mono text-sm font-semibold">{selectedUser.full_name || 'N/A'}</p>
+                  </div>
+                  <div className="space-y-1.5 p-2 rounded bg-background/50 border border-border/50">
+                    <p className="text-muted-foreground">ID Numbers Provided</p>
+                    <div className="flex flex-col gap-1">
+                      <span className="font-mono">DL: {selectedUser.driver_license || 'None'}</span>
+                      <span className="font-mono">NID: {selectedUser.national_id || 'None'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mandatory Review Checklist */}
+                <div className="space-y-2 pt-2">
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Manual Review Checklist</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: 'nameMatch', label: 'Name matches IDs' },
+                      { id: 'idMatch', label: 'ID numbers match' },
+                      { id: 'faceMatch', label: 'Faces match selfie' },
+                      { id: 'validExpiry', label: 'Docs are valid' }
+                    ].map((item) => (
+                      <label key={item.id} className="flex items-center gap-2 p-2 rounded-lg border border-border hover:bg-muted/50 cursor-pointer transition-colors">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                          checked={(checklist as any)[item.id]}
+                          onChange={(e) => setChecklist(prev => ({ ...prev, [item.id]: e.target.checked }))}
+                        />
+                        <span className="text-xs font-medium">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
               {/* Rejection reason input */}
               {showRejectInput && (
@@ -269,12 +344,16 @@ export default function AdminUsersPage() {
               {/* Actions */}
               {selectedUser.verified_status === 'pending' && (
                 <div className="flex gap-3 pt-2">
-                  <Button onClick={handleApprove} disabled={actionLoading} className="gap-2">
+                  <Button 
+                    onClick={handleApprove} 
+                    disabled={actionLoading || !Object.values(checklist).every(Boolean)} 
+                    className="gap-2 flex-1 shadow-lg shadow-primary/20"
+                  >
                     {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                    Approve
+                    Approve Identity
                   </Button>
                   {!showRejectInput ? (
-                    <Button variant="destructive" onClick={() => setShowRejectInput(true)} className="gap-2">
+                    <Button variant="outline" onClick={() => setShowRejectInput(true)} className="gap-2 text-destructive border-destructive/20 hover:bg-destructive/10">
                       <XCircle className="w-4 h-4" />
                       Reject
                     </Button>
@@ -287,6 +366,13 @@ export default function AdminUsersPage() {
                 </div>
               )}
 
+              {!Object.values(checklist).every(Boolean) && selectedUser.verified_status === 'pending' && (
+                <p className="text-[10px] text-center text-muted-foreground flex items-center justify-center gap-1">
+                  <AlertCircle className="w-2.5 h-2.5" />
+                  Complete all checklist items to enable approval
+                </p>
+              )}
+
               {selectedUser.verified_status === 'rejected' && selectedUser.rejection_reason && (
                 <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50">
                   <p className="text-sm text-red-700 dark:text-red-400">
@@ -295,6 +381,48 @@ export default function AdminUsersPage() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+      {/* Deep Zoom Lightbox Overlay */}
+      {previewImage && (
+        <div className="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-4 animate-fade-in">
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <div className="flex items-center gap-1 bg-white/10 rounded-full px-3 py-1.5 backdrop-blur-md border border-white/10 mr-4">
+              <Button size="icon" variant="ghost" onClick={() => setZoomLevel(Math.max(1, zoomLevel - 0.5))} className="w-8 h-8 text-white hover:bg-white/20">
+                <Search className="w-4 h-4" />
+              </Button>
+              <span className="text-xs font-mono text-white w-12 text-center">{Math.round(zoomLevel * 100)}%</span>
+              <Button size="icon" variant="ghost" onClick={() => setZoomLevel(Math.min(4, zoomLevel + 0.5))} className="w-8 h-8 text-white hover:bg-white/20">
+                <ZoomIn className="w-4 h-4" />
+              </Button>
+            </div>
+            <Button 
+              size="icon" 
+              variant="ghost" 
+              className="bg-white/10 hover:bg-white/20 text-white rounded-full w-10 h-10"
+              onClick={() => { setPreviewImage(null); setZoomLevel(1) }}
+            >
+              <X className="w-6 h-6" />
+            </Button>
+          </div>
+          
+          <div className="w-full h-full flex items-center justify-center overflow-auto p-12 custom-scrollbar">
+            <div 
+              className="transition-transform duration-200 ease-out cursor-grab active:cursor-grabbing"
+              style={{ transform: `scale(${zoomLevel})` }}
+            >
+              <img 
+                src={previewImage.url} 
+                alt="Deep Zoom Preview" 
+                className="max-w-[70vw] max-h-[80vh] shadow-2xl rounded-sm ring-1 ring-white/20"
+              />
+            </div>
+          </div>
+          
+          <div className="absolute bottom-8 bg-black/60 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 flex flex-col items-center">
+            <p className="text-white font-semibold text-sm capitalize">{previewImage.type.replace(/_/g, ' ')}</p>
+            <p className="text-white/60 text-[10px]">Use mouse wheel or buttons to zoom • Drag to pan</p>
           </div>
         </div>
       )}

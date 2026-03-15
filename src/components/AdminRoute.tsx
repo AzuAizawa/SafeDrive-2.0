@@ -14,7 +14,7 @@ export default function AdminRoute() {
   }
 
   if (!profile || profile.role !== 'admin') {
-    return <Navigate to="/" replace />
+    return <Navigate to="/admin/login" replace />
   }
 
   return <Outlet />

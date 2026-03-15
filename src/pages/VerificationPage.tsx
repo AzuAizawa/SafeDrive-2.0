@@ -45,13 +45,74 @@ export default function VerificationPage() {
 
   if (profile?.verified_status === 'verified') {
     return (
-      <div className="max-w-lg mx-auto text-center py-20 animate-fade-in">
-        <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-          <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+      <div className="max-w-2xl mx-auto animate-fade-in space-y-6 pb-12">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+              <ShieldCheck className="w-8 h-8 text-green-500" />
+              Account & Identity
+            </h1>
+            <p className="text-muted-foreground mt-1">Your account is fully verified and secure.</p>
+          </div>
+          <div className="flex items-center gap-2 bg-green-500/10 text-green-500 px-4 py-2 rounded-full border border-green-500/20">
+            <CheckCircle className="w-4 h-4" />
+            <span className="text-sm font-bold uppercase tracking-wider">Verified</span>
+          </div>
         </div>
-        <h2 className="text-2xl font-bold mb-2">You're Verified!</h2>
-        <p className="text-muted-foreground mb-6">Your identity has been verified. You have full access to SafeDrive.</p>
-        <Button onClick={() => navigate('/browse')}>Browse Cars</Button>
+
+        <Card className="overflow-hidden border-green-500/10">
+          <div className="h-2 bg-green-500" />
+          <CardHeader>
+            <CardTitle>Verified Profile</CardTitle>
+            <CardDescription>These details were verified against your government ID.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid sm:grid-cols-2 gap-6">
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Full Name</p>
+              <p className="text-lg font-semibold">{profile.full_name}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email Address</p>
+              <p className="text-lg font-semibold">{profile.email}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Contact Number</p>
+              <p className="text-lg font-semibold">{profile.phone || 'Not provided'}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Birthday</p>
+              <p className="text-lg font-semibold">{profile.birthday || 'Not provided'}</p>
+            </div>
+            <div className="space-y-1 sm:col-span-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Home Address</p>
+              <p className="text-lg font-semibold">{profile.address || 'Not provided'}</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Documents</CardTitle>
+            <CardDescription>Your identity documents are securely stored and verified.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/50 border border-border/50">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <ShieldCheck className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <p className="font-semibold text-sm">Identity Documents Verified</p>
+                <p className="text-xs text-muted-foreground">Driver's License and National ID have been approved.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-center">
+          <Button variant="outline" onClick={() => navigate('/browse')} className="rounded-xl">
+            Back to Browse
+          </Button>
+        </div>
       </div>
     )
   }

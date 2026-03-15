@@ -152,9 +152,9 @@ export default function DashboardLayout() {
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64 p-2 rounded-2xl border-border/40 bg-background/95 backdrop-blur-md">
-                  <DropdownMenuLabel className="font-normal p-3">
+                  <div className="font-normal p-3">
                     <div className="flex flex-col gap-1.5">
-                      <p className="text-sm font-bold truncate">{profile?.full_name || profile?.email}</p>
+                      <p className="text-sm font-bold truncate">{profile?.full_name || profile?.email || user?.email}</p>
                       <div className="flex items-center gap-2">
                          <span className={`text-[10px] font-bold uppercase tracking-[0.1em] px-2 py-0.5 rounded-md ${
                           profile?.verified_status === 'verified' ? 'bg-green-500/10 text-green-500' :
@@ -165,20 +165,13 @@ export default function DashboardLayout() {
                         </span>
                       </div>
                     </div>
-                  </DropdownMenuLabel>
+                  </div>
                   <DropdownMenuSeparator className="opacity-50" />
                   <DropdownMenuGroup className="space-y-1">
-                    <DropdownMenuItem onClick={() => navigate('/profile')} className="rounded-xl p-2.5">
+                    <DropdownMenuItem onClick={() => navigate('/verify')} className="rounded-xl p-2.5">
                       <User className="mr-2 h-4 w-4 opacity-70" />
-                      View Profile
+                      {profile?.verified_status === 'verified' ? 'Account & Identity' : 'Get Verified'}
                     </DropdownMenuItem>
-                    
-                    {!isVerified && profile?.verified_status !== 'pending' && (
-                      <DropdownMenuItem onClick={() => navigate('/verify')} className="rounded-xl p-2.5 bg-amber-500/5 text-amber-500 focus:text-amber-500">
-                        <ShieldAlert className="mr-2 h-4 w-4" />
-                        Get Verified
-                      </DropdownMenuItem>
-                    )}
 
                     {isVerified && (
                       <DropdownMenuItem onClick={handleToggleMode} className="rounded-xl p-2.5 bg-primary/5 text-primary focus:text-primary">

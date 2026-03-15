@@ -16,13 +16,13 @@ import BrowseCarsPage from '@/pages/BrowseCarsPage'
 import CarDetailPage from '@/pages/CarDetailPage'
 import MyBookingsPage from '@/pages/MyBookingsPage'
 import VerificationPage from '@/pages/VerificationPage'
-import ProfilePage from '@/pages/ProfilePage'
 import MyVehiclesPage from '@/pages/MyVehiclesPage'
 import ListerBookingsPage from '@/pages/ListerBookingsPage'
 import NotificationsPage from '@/pages/NotificationsPage'
 
 // Admin Pages
 import AdminDashboard from '@/pages/admin/AdminDashboard'
+import AdminLoginPage from '@/pages/admin/AdminLoginPage'
 import AdminUsersPage from '@/pages/admin/AdminUsersPage'
 import AdminCarCatalogPage from '@/pages/admin/AdminCarCatalogPage'
 import AdminVehicleApprovalPage from '@/pages/admin/AdminVehicleApprovalPage'
@@ -49,6 +49,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/admin/login" element={<AdminLoginPage />} />
 
               {/* Protected User Routes */}
               <Route element={<ProtectedRoute />}>
@@ -57,7 +58,6 @@ function App() {
                   <Route path="/cars/:id" element={<CarDetailPage />} />
                   <Route path="/my-bookings" element={<MyBookingsPage />} />
                   <Route path="/verify" element={<VerificationPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/my-vehicles" element={<MyVehiclesPage />} />
                   <Route path="/lister-bookings" element={<ListerBookingsPage />} />
                   <Route path="/notifications" element={<NotificationsPage />} />
