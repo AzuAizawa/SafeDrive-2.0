@@ -69,17 +69,9 @@ export default function AdminLayout() {
             </NavLink>
           ))}
 
-          <div className="pt-8 px-3 mb-2">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Shortcuts</p>
-          </div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/40"
-            onClick={() => navigate('/browse')}
-          >
-            <ExternalLink className="w-4 h-4 opacity-80" />
-            View Live Site
-          </Button>
+           <div className="pt-8 px-3 mb-2">
+             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Shortcuts</p>
+           </div>
         </nav>
 
         <div className="p-4 border-t border-border/40 bg-muted/20 space-y-1.5">

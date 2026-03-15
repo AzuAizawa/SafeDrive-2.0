@@ -7,13 +7,14 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Car, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import type { Profile } from '@/types/database'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const { signIn } = useAuth()
+  const { signIn, signOut } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,8 +24,17 @@ export default function LoginPage() {
     if (error) {
       toast.error('Login failed', { description: error.message })
     } else {
-      toast.success('Welcome back!')
-      navigate('/browse')
+      // Check if the signed-in user is an admin
+      const { profile } = useAuth()
+      if (profile && profile.role === 'admin') {
+        // If admin tries to log in via user login, sign them out and show error
+        await signOut()
+        toast.error('Admin users must use the admin login page')
+        navigate('/admin/login')
+      } else {
+        toast.success('Welcome back!')
+        navigate('/browse')
+      }
     }
     setIsLoading(false)
   }
@@ -32,7 +42,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/3 p-4">
       <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -translate-x-1/3 -translate-y-1/3 pointer-events-none" />
-      
+
       <div className="w-full max-w-md animate-scale-in">
         <div className="flex items-center justify-center gap-2.5 mb-8">
           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/25">
