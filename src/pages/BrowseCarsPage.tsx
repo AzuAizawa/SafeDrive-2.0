@@ -84,7 +84,7 @@ export default function BrowseCarsPage() {
             className="pl-9 h-10"
           />
         </div>
-        <Select value={bodyTypeFilter} onValueChange={setBodyTypeFilter}>
+        <Select value={bodyTypeFilter} onValueChange={(val) => setBodyTypeFilter(val || 'all')}>
           <SelectTrigger className="w-full sm:w-44 h-10">
             <SelectValue placeholder="Body Type" />
           </SelectTrigger>

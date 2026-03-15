@@ -1,0 +1,15 @@
+﻿src/components/AdminLayout.tsx(6,30): error TS6133: 'ExternalLink' is declared but its value is never read.
+src/components/DashboardLayout.tsx(11,3): error TS6133: 'DropdownMenuLabel' is declared but its value is never read.
+src/components/DashboardLayout.tsx(28,3): error TS6133: 'ShieldAlert' is declared but its value is never read.
+src/pages/admin/AdminLoginPage.tsx(10,1): error TS6133: 'Profile' is declared but its value is never read.
+src/pages/BrowseCarsPage.tsx(87,40): error TS2322: Type 'Dispatch<SetStateAction<string>>' is not assignable to type '(value: string | null, eventDetails: SelectRootChangeEventDetails) => void'.
+  Types of parameters 'value' and 'value' are incompatible.
+    Type 'string | null' is not assignable to type 'SetStateAction<string>'.
+      Type 'null' is not assignable to type 'SetStateAction<string>'.
+src/pages/LoginPage.tsx(10,1): error TS6133: 'Profile' is declared but its value is never read.
+src/pages/NotificationsPage.tsx(37,32): error TS2345: Argument of type '{ id: string; user_id: string; title: string; message: string; type: string; read: boolean | null; link: string | null; created_at: string | null; }[]' is not assignable to parameter of type 'SetStateAction<Notification[]>'.
+  Type '{ id: string; user_id: string; title: string; message: string; type: string; read: boolean | null; link: string | null; created_at: string | null; }[]' is not assignable to type 'Notification[]'.
+    Type '{ id: string; user_id: string; title: string; message: string; type: string; read: boolean | null; link: string | null; created_at: string | null; }' is not assignable to type 'Notification'.
+      Types of property 'read' are incompatible.
+        Type 'boolean | null' is not assignable to type 'boolean'.
+          Type 'null' is not assignable to type 'boolean'.

@@ -7,14 +7,13 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Car, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Profile } from '@/types/database'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const { signIn, signOut } = useAuth()
+  const { signIn, signOut, profile } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,7 +24,6 @@ export default function LoginPage() {
       toast.error('Login failed', { description: error.message })
     } else {
       // Check if the signed-in user is an admin
-      const { profile } = useAuth()
       if (profile && profile.role === 'admin') {
         // If admin tries to log in via user login, sign them out and show error
         await signOut()

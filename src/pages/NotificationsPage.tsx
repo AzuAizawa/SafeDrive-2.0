@@ -9,7 +9,13 @@ import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 
 interface Notification {
-  id: string; title: string; message: string; type: string; read: boolean; link: string | null; created_at: string
+  id: string; 
+  title: string; 
+  message: string; 
+  type: string; 
+  read: boolean | null; 
+  link: string | null; 
+  created_at: string | null
 }
 
 const iconMap: Record<string, React.ElementType> = {
@@ -28,18 +34,20 @@ export default function NotificationsPage() {
   useEffect(() => { if (user) fetchNotifications() }, [user])
 
   const fetchNotifications = async () => {
+    if (!user) return
     setLoading(true)
     const { data } = await supabase
       .from('notifications')
       .select('*')
-      .eq('user_id', user!.id)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-    if (data) setNotifications(data)
+    if (data) setNotifications(data as Notification[])
     setLoading(false)
   }
 
   const markAllRead = async () => {
-    await supabase.from('notifications').update({ read: true }).eq('user_id', user!.id).eq('read', false)
+    if (!user) return
+    await supabase.from('notifications').update({ read: true }).eq('user_id', user.id).eq('read', false)
     fetchNotifications()
   }
 
@@ -86,7 +94,7 @@ export default function NotificationsPage() {
                   <div className="flex-1 min-w-0">
                     <p className={`text-sm font-medium ${!n.read ? 'text-foreground' : 'text-muted-foreground'}`}>{n.title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1">{format(new Date(n.created_at), 'MMM d, yyyy h:mm a')}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">{n.created_at ? format(new Date(n.created_at), 'MMM d, yyyy h:mm a') : 'Recently'}</p>
                   </div>
                   {!n.read && <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-2" />}
                 </CardContent>

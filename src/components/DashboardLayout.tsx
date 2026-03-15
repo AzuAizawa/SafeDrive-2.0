@@ -8,7 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
@@ -25,7 +24,6 @@ import {
   Moon,
   Bell,
   ArrowLeftRight,
-  ShieldAlert,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'

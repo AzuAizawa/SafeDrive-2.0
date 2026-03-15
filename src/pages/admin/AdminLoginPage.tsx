@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Shield, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Profile } from '@/types/database'
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('')

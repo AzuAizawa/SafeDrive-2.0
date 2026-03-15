@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import {
   LayoutDashboard, Users, Car, CarFront, ClipboardList, CreditCard,
-  LogOut, Sun, Moon, Shield, ExternalLink,
+  LogOut, Sun, Moon, Shield,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
