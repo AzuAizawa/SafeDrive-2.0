@@ -5,7 +5,12 @@ import { useAuth } from '@/contexts/AuthContext'
 
 export default function LandingPage() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
+
+  const handleSignOut = async () => {
+    await signOut()
+    navigate('/')
+  }
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -26,10 +31,15 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-3">
               {user ? (
-                <Button onClick={() => navigate('/browse')} className="gap-2">
-                  Go to Dashboard
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
+                <>
+                  <Button variant="ghost" onClick={handleSignOut}>
+                    Log Out
+                  </Button>
+                  <Button onClick={() => navigate('/browse')} className="gap-2">
+                    Go to Dashboard
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </>
               ) : (
                 <>
                   <Button variant="ghost" onClick={() => navigate('/login')}>
