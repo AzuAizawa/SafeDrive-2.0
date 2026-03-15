@@ -47,6 +47,16 @@ export default function DashboardLayout() {
 
   const handleToggleMode = useCallback(async () => {
     if (!user || !profile) return
+    
+    // Safety check: Prevent unverified users from switching to lister mode
+    if (!isVerified && !isLister) {
+      toast.error('Identity Verification Required', {
+        description: 'Please complete your verification to unlock Lister features.'
+      })
+      navigate('/verify')
+      return
+    }
+
     const { error } = await supabase
       .from('profiles')
       .update({ is_lister: !isLister })
@@ -55,7 +65,7 @@ export default function DashboardLayout() {
       await refreshProfile()
       toast.success(isLister ? 'Switched to Renter mode' : 'Switched to Lister mode')
     }
-  }, [user, profile, isLister, refreshProfile])
+  }, [user, profile, isLister, isVerified, refreshProfile, navigate])
 
   const navItems = [
     { to: '/browse', label: 'Browse Cars', icon: CarFront },
@@ -225,16 +235,21 @@ export default function DashboardLayout() {
                   {item.label}
                 </NavLink>
               ))}
-              <div className="pt-4 px-2 border-t border-border/40 mt-4">
-                 <Button 
-                   className="w-full justify-start gap-3 rounded-xl" 
-                   variant="ghost" 
-                   onClick={handleToggleMode}
-                 >
-                   <ArrowLeftRight className="w-4 h-4" />
-                   {isLister ? 'Switch to Renter' : 'Switch to Lister'}
-                 </Button>
-              </div>
+              {isVerified && (
+                <div className="pt-4 px-2 border-t border-border/40 mt-4">
+                  <Button 
+                    className="w-full justify-start gap-3 rounded-xl bg-primary/5 text-primary" 
+                    variant="ghost" 
+                    onClick={() => {
+                      handleToggleMode()
+                      setMobileMenuOpen(false)
+                    }}
+                  >
+                    <ArrowLeftRight className="w-4 h-4" />
+                    {isLister ? 'Switch to Renter' : 'Switch to Lister'}
+                  </Button>
+                </div>
+              )}
             </nav>
           </div>
         )}
